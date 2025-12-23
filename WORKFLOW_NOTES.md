@@ -39,6 +39,16 @@ This document captures the intended changes for the workflow that supports Works
 - **Error handling**: Log and mark records when a page fails to fetch or parse, and retry with backoff.
 - **Security**: Avoid scraping untrusted auth-gated pages; sanitize URLs before requests.
 
+## Validation checklist (run in a non-production Airtable/base)
+
+- **Deduping**: Create two records with the same Grant ID/Opportunity Number/Funding and Opportunity Number and confirm only one Airtable row is kept or updated.
+- **URL chaining**: Verify the AI transformation node updates the grant URL with the ID, and the downstream scraper reads that Airtable URL (including after redirects or pagination).
+- **Field capture**: Load a grant page that contains all listed fields plus an extra attribute; confirm mapped fields populate Airtable columns and the unmapped attribute is appended to `Comments`.
+- **Document storage**: Upload a <15 MB attachment and ensure it is stored in Google Drive with both the original and Drive URLs written back to Airtable. Repeat with a >15 MB file to confirm it is skipped, the source URL is retained, and `Comments` notes the size issue.
+- **Backlinks**: Inspect structured notes to ensure each entry retains clickable links to both the original and stored copies when available.
+- **Analysis output**: Feed long text to confirm chunking and summarization stay within model token limits while preserving key eligibility, deadline, budget, scoring, and attachment details.
+- **Failure handling**: Simulate an unreachable page to verify logging, retries with backoff, and Airtable markers for follow-up.
+
 ## Open questions for the requester
 
 At this time, all provided requirements have been incorporated. Flag any further limits (e.g., rate caps, page fetch throttles, or preferred Google Drive folder structure) before implementation.
